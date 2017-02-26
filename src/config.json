@@ -1,0 +1,12 @@
+[
+    {
+        "input_file": "../data/bayesian_methods/p27.svg",
+        "graph": [
+            {
+                "type": "circles",
+                "id_from": "g7614",
+                "id_to": "g27614" 
+            }
+        ]
+    }
+]

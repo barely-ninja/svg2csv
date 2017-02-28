@@ -35,7 +35,9 @@ def collect_siblings(parent, id_from, id_to):
         if child.attrib["id"] == id_to:
             return id_list
 
-def parse_circles(element):
+
+
+def parse_circles(element, step=1):
     'Dumps translate attributes in subtree'
     def get_shift(el):
         'Extracts shift vector from transform string'
@@ -43,17 +45,24 @@ def parse_circles(element):
     def sum_tuples(a, b):
         'Element-wise tuple sum'
         return tuple(sum(x) for x in zip(a, b))
-    position = [get_shift(element)]
+    last_shift = get_shift(element)
+    position = [last_shift]
+
+    count = 0
     for child in element.findall('.//svg:g', NS):
         try:
-            shift = sum_tuples(position[-1], get_shift(child))
-            position.append(shift)
+            shift = sum_tuples(last_shift, get_shift(child))
+            count += 1
+            last_shift = shift
+            if not count % step:
+                position.append(shift)
         except KeyError:
             continue
     return position
 
-def parse_crosses():
-    'Dumps translate attributes skipping every 4'
+def parse_crosses(element):
+    'Dumps translate attributes skipping every second one'
+    return parse_circles(element, step=2)
 
 def make_scale_func(coeff):
     'Closure for fixed params of scaling function'
@@ -64,6 +73,15 @@ def make_scale_func(coeff):
         nonlocal coeff
         return tuple(scale(value[i], coeff[i]) for i in range(2))
     return scale_func
+
+def rearrange(data):
+    'sorts groups preserving the order of group elements'
+    def flip(l):
+        if l[0][0] > l[-1][0]:
+            l.reverse()
+        return l
+    sorted_data = sorted([flip(l) for l in data], key=lambda l: l[0][0])
+    return [item for sublist in sorted_data for item in sublist]
 
 def parse_helper(config_file_name):
     'parses input SVG file'
@@ -81,7 +99,8 @@ def parse_helper(config_file_name):
             parse_ids = collect_siblings(container, series["id_from"], series["id_to"])
             data = []
             for elem_id in parse_ids:
-                data += parsers[series["type"]](container.find('./*[@id="{}"]'.format(elem_id)))
+                data.append(parsers[series["type"]](
+                    container.find('./*[@id="{}"]'.format(elem_id))))
             coeff = ({
                 'off': series["elem_offset_svg"][0],
                 'min_u': task["x_range_shown"][0],
@@ -95,11 +114,11 @@ def parse_helper(config_file_name):
                 'min_s': series["y_range_svg"][0],
                 'max_s': series["y_range_svg"][1]
             })
+            sorted_data = rearrange(data)
             scale_func = make_scale_func(coeff)
-            scaled_data = [scale_func(item) for item in
-                           sorted(data, key=lambda item: item[0])]
+            scaled_data = [scale_func(item) for item in sorted_data]
             with open(task['output_prefix']+series['y_name']+'.csv', 'wt') as fout:
-                print('{},{}'.format(task['x_name'],series['y_name']), file=fout)
+                print('{},{}'.format(task['x_name'], series['y_name']), file=fout)
                 cout = csv.writer(fout)
                 cout.writerows(scaled_data)
 

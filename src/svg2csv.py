@@ -83,6 +83,12 @@ def rearrange(data):
     sorted_data = sorted([flip(l) for l in data], key=lambda l: l[0][0])
     return [item for sublist in sorted_data for item in sublist]
 
+def make_graph(data, fn):
+    from matplotlib.pylab import scatter, savefig, close
+    scatter(*zip(*data))
+    savefig(fn)
+    close()
+
 def parse_helper(config_file_name):
     'parses input SVG file'
     parsers = {
@@ -117,6 +123,8 @@ def parse_helper(config_file_name):
             sorted_data = rearrange(data)
             scale_func = make_scale_func(coeff)
             scaled_data = [scale_func(item) for item in sorted_data]
+            if 'graph' in task and task["graph"] == "yes":
+                make_graph(scaled_data, task['output_prefix']+series['y_name']+'.png')
             with open(task['output_prefix']+series['y_name']+'.csv', 'wt') as fout:
                 print('{},{}'.format(task['x_name'], series['y_name']), file=fout)
                 cout = csv.writer(fout)

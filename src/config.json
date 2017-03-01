@@ -2,6 +2,7 @@
     {
         "input_file": "../data/bayesian_methods/p27.svg",
         "output_prefix": "../out/p27_",
+        "graph": "yes",
         "x_name": "time_days",
         "x_range_shown": [0.0, 6.0],
         "x_range_svg": [197.32201, 382.54401],
@@ -12,7 +13,7 @@
                 "id_from": "g7614",
                 "id_to": "g27614",
                 "elem_offset_svg": [-1.706, 0.0],
-                "y_range_shown": [-200.0, 200.0],
+                "y_range_shown": [-150.0, 200.0],
                 "y_range_svg": [98.637001, 242.55]
             },
             {
@@ -21,7 +22,7 @@
                 "id_from": "g27986",
                 "id_to": "g30386",
                 "elem_offset_svg": [1.1845, -1.1845],
-                "y_range_shown": [-200.0, 200.0],
+                "y_range_shown": [-150.0, 200.0],
                 "y_range_svg": [98.637001, 242.55]
             }
         ]
@@ -29,6 +30,7 @@
     {
         "input_file": "../data/bayesian_methods/p30.svg",
         "output_prefix": "../out/p30_",
+        "graph": "yes",
         "x_name": "time_hours",
         "x_range_shown": [18.0, 24.0],
         "x_range_svg": [101.137, 358.42899],
